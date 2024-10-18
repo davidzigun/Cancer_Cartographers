@@ -50,7 +50,7 @@ def welcome():
 
 @app.route("/api/v1.0/plant_names")
 def plant_names():
-    # Create a session (link) from Python to the database
+    # Create a session from Python to the database
     session = Session(engine)
 
     """Return a list of all plant names"""
@@ -66,7 +66,7 @@ def plant_names():
 
 @app.route("/api/v1.0/plant_details")
 def plant_details():
-    # Create a session (link) from Python to the database
+    # Create a session from Python to the database
     session = Session(engine)
 
     """Return a list of plant data including the name, latitude, and longitude of each plant"""
@@ -89,11 +89,11 @@ def plant_details():
 #Endpoint for cancer data
 @app.route("/api/v1.0/cancer_data")
 def cancer_data():
-    # Create a session (link) from Python to the database
+    # Create a session from Python to the database
     session = Session(engine)
 
     """Return a list of cancer data"""
-    # Query the cancer data (replace columns with actual column names)
+    # Query the cancer data
     results = session.query(CancerData.county, CancerData.fips, CancerData.average_annual_count, CancerData.state).all()
 
     session.close()
@@ -114,11 +114,11 @@ def cancer_data():
 #Endpoint for breast cancer data
 @app.route("/api/v1.0/breast_data")
 def breast_data():
-    # Create a session (link) from Python to the database
+    # Create a session from Python to the database
     session = Session(engine)
 
     """Return a list of cancer data"""
-    # Query the cancer data (replace columns with actual column names)
+    # Query the cancer data
     results = session.query(BreastData.county, BreastData.fips, BreastData.average_annual_count, BreastData.state).all()
 
     session.close()

@@ -70,7 +70,7 @@ fetch('http://127.0.0.1:5000/api/v1.0/cancer_data')
       let normalizedCounty = normalizeName(item.county);
       cancerRatesByCounty[normalizedCounty] = {
         county: item.county,
-        state: item.state,
+        //state: item.state,
         average_annual_count: parseFloat(item.average_annual_count)
       };
     });
@@ -113,7 +113,7 @@ fetch('http://127.0.0.1:5000/api/v1.0/breast_data')
       let normalizedCounty = normalizeName(item.county);
       breastCancerRatesByCounty[normalizedCounty] = {
         county: item.county,
-        state: item.state,
+        //state: item.state,
         average_annual_count: parseFloat(item.average_annual_count)
       };
     });
@@ -152,30 +152,58 @@ fetch('http://127.0.0.1:5000/api/v1.0/breast_data')
 // Set up the legend for general cancer rates
 let cancerLegend = L.control({ position: "bottomright" });
 cancerLegend.onAdd = function() {
-  let div = L.DomUtil.create("div", "info legend");
-  let grades = [0, 200, 600, 1000, 1400, 1800];
-  div.innerHTML += "<h4>General Cancer Rates</h4>";
-  for (let i = 0; i < grades.length; i++) {
-    div.innerHTML +=
-        '<i style="background:' + getColor(grades[i]) + '"></i> ' +  // Ensure getColor is used correctly
-        grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-  }
-  return div;
+    let div = L.DomUtil.create("div", "info legend");
+
+    // Define the limits and the corresponding colors from the getColor() function
+    let limits = [0, 200, 600, 1000, 1400, 1800];
+    let colors = ['#FFFFFF', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
+    let labels = [];
+
+    // Add the minimum and maximum for display
+    let legendInfo = "<h4>General Cancer Rates</h4>" +
+        "<div class=\"labels\">" +
+        "<div class=\"min\">" + limits[0] + "</div>" +
+        "<div class=\"max\">" + limits[limits.length - 1] + "+</div>" +
+        "</div>";
+
+    div.innerHTML = legendInfo;
+
+    // Create a label for each color and limit
+    limits.forEach(function(limit, index) {
+        labels.push("<li style=\"background-color: " + colors[index] + "\"></li> " + limit);
+    });
+
+    // Add the labels to the legend div
+    div.innerHTML += "<ul>" + labels.join("") + "</ul>";
+    return div;
 };
 cancerLegend.addTo(myMap);
 
 // Set up the legend for breast cancer rates
-let breastCancerLegend = L.control({ position: "bottomright" });
+let breastCancerLegend = L.control({ position: "bottomleft" });
 breastCancerLegend.onAdd = function() {
-  let div = L.DomUtil.create("div", "info legend");
-  let grades = [0, 50, 100, 200, 300, 500];
-  div.innerHTML += "<h4>Breast Cancer Rates</h4>";
-  for (let i = 0; i < grades.length; i++) {
-    div.innerHTML +=
-        '<i style="background:' + getBreastCancerColor(grades[i]) + '"></i> ' +  // Ensure getBreastCancerColor is used correctly
-        grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-  }
-  return div;
+    let div = L.DomUtil.create("div", "info legend");
+    let limits = [0, 50, 100, 200, 300, 500];
+    let colors = ['#FFF0F5', '#FFC0CB', '#FFB6C1', '#FF1493', '#FF69B4', '#8B008B'];
+    let labels = [];
+
+    // Add the minimum and maximum for display
+    let legendInfo = "<h4>Breast Cancer Rates</h4>" +
+        "<div class=\"labels\">" +
+        "<div class=\"min\">" + limits[0] + "</div>" +
+        "<div class=\"max\">" + limits[limits.length - 1] + "+</div>" +
+        "</div>";
+
+    div.innerHTML = legendInfo;
+
+    // Create a label for each color and limit
+    limits.forEach(function(limit, index) {
+        labels.push("<li style=\"background-color: " + colors[index] + "\"></li> " + limit);
+    });
+
+    // Add the labels to the legend div
+    div.innerHTML += "<ul>" + labels.join("") + "</ul>";
+    return div;
 };
 breastCancerLegend.addTo(myMap);
 
@@ -183,14 +211,14 @@ breastCancerLegend.addTo(myMap);
 let baseMaps = { "OpenStreetMap": myMap };
 let overlayMaps = {
   "Nuclear Sites": nuclearLayer,
-  "Cancer Rates": cancerLayer,
+  "General Cancer Rates": cancerLayer,
   "Breast Cancer Rates": breastCancerLayer
 };
 
 // Adding the layer control to the map
 L.control.layers(baseMaps, overlayMaps).addTo(myMap);
 
-// Add default layers to the map
+// Add layers to the map
 nuclearLayer.addTo(myMap);
 cancerLayer.addTo(myMap);
 breastCancerLayer.addTo(myMap);
