@@ -2,7 +2,7 @@ import numpy as np
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from config import password
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -12,14 +12,19 @@ from flask_cors import CORS
 #################################################
 
 # Replace the connection details with your PostgreSQL details
-engine = create_engine(f"postgresql://postgres:{password}@localhost/nuclear")
+engine = create_engine(f"postgresql://postgres:{password}@localhost/cancer_db")
+
+inspector = inspect(engine)
+print(inspector.get_table_names())
 
 # Reflect the database tables
 Base = automap_base()
-Base.prepare(autoload_with=engine)
+Base.prepare(engine, reflect=True)
+print(Base.classes.keys())
 
-# Assuming your PostgreSQL table is called `nuclear_plants`, save a reference to it
-NuclearPlant = Base.classes.nuclear_plants
+# Save a reference to the tables
+NuclearPlant = Base.classes.nuclear_power_plants
+CancerData = Base.classes.cleaned_all_cancer
 
 #################################################
 # Flask Setup
@@ -38,6 +43,7 @@ def welcome():
         f"Available Routes:<br/>"
         f"/api/v1.0/plant_names<br/>"
         f"/api/v1.0/plant_details"
+        f"/api/v1.0/cancer_data"
     )
 
 @app.route("/api/v1.0/plant_names")
@@ -77,6 +83,31 @@ def plant_details():
         all_plants.append(plant_dict)
 
     return jsonify(all_plants)
+
+#Endpoint for cancer data
+@app.route("/api/v1.0/cancer_data")
+def cancer_data():
+    # Create a session (link) from Python to the database
+    session = Session(engine)
+
+    """Return a list of cancer data"""
+    # Query the cancer data (replace columns with actual column names)
+    results = session.query(CancerData.county, CancerData.fips, CancerData.average_annual_count, CancerData.state).all()
+
+    session.close()
+
+    # Create a dictionary from the row data and append to a list of all_cancer_data
+    all_cancer_data = []
+    for county, fips, avg_count, state in results:
+        cancer_dict = {
+            "county": county,
+            "fips": fips,
+            "average_annual_count": avg_count,
+            "state": state
+        }
+        all_cancer_data.append(cancer_dict)
+
+    return jsonify(all_cancer_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
