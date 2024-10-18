@@ -25,6 +25,7 @@ print(Base.classes.keys())
 # Save a reference to the tables
 NuclearPlant = Base.classes.nuclear_power_plants
 CancerData = Base.classes.cleaned_all_cancer
+BreastData = Base.classes.breast_cancer
 
 #################################################
 # Flask Setup
@@ -42,8 +43,9 @@ def welcome():
     return (
         f"Available Routes:<br/>"
         f"/api/v1.0/plant_names<br/>"
-        f"/api/v1.0/plant_details"
-        f"/api/v1.0/cancer_data"
+        f"/api/v1.0/plant_details<br/>"
+        f"/api/v1.0/cancer_data<br/>"
+        f"/api/v1.0/breast_data"
     )
 
 @app.route("/api/v1.0/plant_names")
@@ -108,6 +110,31 @@ def cancer_data():
         all_cancer_data.append(cancer_dict)
 
     return jsonify(all_cancer_data)
+
+#Endpoint for breast cancer data
+@app.route("/api/v1.0/breast_data")
+def breast_data():
+    # Create a session (link) from Python to the database
+    session = Session(engine)
+
+    """Return a list of cancer data"""
+    # Query the cancer data (replace columns with actual column names)
+    results = session.query(BreastData.county, BreastData.fips, BreastData.average_annual_count, BreastData.state).all()
+
+    session.close()
+
+    # Create a dictionary from the row data and append to a list of all_cancer_data
+    breast_cancer_data = []
+    for county, fips, avg_count, state in results:
+        breast_cancer_dict = {
+            "county": county,
+            "fips": fips,
+            "average_annual_count": avg_count,
+            "state": state
+        }
+        breast_cancer_data.append(breast_cancer_dict)
+
+    return jsonify(breast_cancer_data)
 
 if __name__ == '__main__':
     app.run(debug=True)

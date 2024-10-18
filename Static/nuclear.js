@@ -9,12 +9,15 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(myMap);
 
+// Layer groups for nuclear plants, cancer data, and breast cancer data
+let nuclearLayer = L.layerGroup();
+let cancerLayer = L.layerGroup();
+let breastCancerLayer = L.layerGroup();
+
+// Fetch nuclear power plant data
 fetch('http://127.0.0.1:5000/api/v1.0/plant_details')
   .then(response => response.json())
   .then(data => {
-    // Log the data to see if it's being fetched correctly
-    console.log("Fetched Plant Data: ", data);
-
     data.forEach(plant => {
       let lat = parseFloat(plant.latitude);
       let lon = parseFloat(plant.longitude);
@@ -22,31 +25,172 @@ fetch('http://127.0.0.1:5000/api/v1.0/plant_details')
 
       if (!isNaN(lat) && !isNaN(lon)) {
         L.circleMarker([lat, lon], {
-          radius: 5,
-          fillColor: "#ff7800",
+          radius: 7,
+          fillColor: "limegreen",
           color: "#000",
           weight: 1,
           fillOpacity: 0.8
         })
         .bindPopup("<strong>Nuclear Power Plant:</strong> " + plantName)
-        .addTo(myMap);
+        .addTo(nuclearLayer);
       }
     });
   });
- 
+
+// Functions to get colors based on cancer rates
+function getColor(count) {
+  return count > 1800 ? '#800026' :
+         count > 1400 ? '#BD0026' :
+         count > 1000 ? '#E31A1C' :
+         count > 600  ? '#FC4E2A' :
+         count > 200  ? '#FD8D3C' :
+                        '#FFFFFF';
+}
+
+function getBreastCancerColor(count) {
+  return count > 500 ? '#8B008B' :
+         count > 300 ? '#FF69B4' :
+         count > 200 ? '#FF1493' :
+         count > 100 ? '#FFB6C1' :
+         count > 50  ? '#FFC0CB' :
+                        '#FFF0F5';
+}
+
+// Helper function to normalize county names
+function normalizeName(name) {
+  return name.toLowerCase().replace('county', '').trim();
+}
+
+// Fetch cancer data and apply to map as a choropleth
+fetch('http://127.0.0.1:5000/api/v1.0/cancer_data')
+  .then(response => response.json())
+  .then(data => {
+    let cancerRatesByCounty = {};
+    data.forEach(item => {
+      let normalizedCounty = normalizeName(item.county);
+      cancerRatesByCounty[normalizedCounty] = {
+        county: item.county,
+        state: item.state,
+        average_annual_count: parseFloat(item.average_annual_count)
+      };
+    });
+
+    fetch('gz_2010_us_050_00_5m.json')
+      .then(response => response.json())
+      .then(geoData => {
+        L.geoJson(geoData, {
+          style: function(feature) {
+            let geoCountyName = normalizeName(feature.properties.NAME);
+            let countyData = cancerRatesByCounty[geoCountyName];
+            let cancerRate = countyData ? countyData.average_annual_count : 0;
+            return {
+              fillColor: getColor(cancerRate),
+              weight: 2,
+              opacity: 1,
+              color: 'white',
+              dashArray: '3',
+              fillOpacity: 0.7
+            };
+          },
+          onEachFeature: function(feature, layer) {
+            let geoCountyName = normalizeName(feature.properties.NAME);
+            let countyData = cancerRatesByCounty[geoCountyName];
+            let cancerRate = countyData ? countyData.average_annual_count : "No data";
+            let countyName = countyData ? countyData.county : "Unknown";
+            layer.bindPopup(`<strong>${countyName}</strong><br>Average Annual Count: ${cancerRate}`);
+          }
+        }).addTo(cancerLayer);
+      })
+  })
+
+
+// Fetch breast cancer data and apply to map
+fetch('http://127.0.0.1:5000/api/v1.0/breast_data')
+  .then(response => response.json())
+  .then(data => {
+    let breastCancerRatesByCounty = {};
+    data.forEach(item => {
+      let normalizedCounty = normalizeName(item.county);
+      breastCancerRatesByCounty[normalizedCounty] = {
+        county: item.county,
+        state: item.state,
+        average_annual_count: parseFloat(item.average_annual_count)
+      };
+    });
+
+    fetch('gz_2010_us_050_00_5m.json')
+      .then(response => response.json())
+      .then(geoData => {
+        L.geoJson(geoData, {
+          style: function(feature) {
+            let geoCountyName = normalizeName(feature.properties.NAME);
+            let countyData = breastCancerRatesByCounty[geoCountyName];
+            let cancerRate = countyData ? countyData.average_annual_count : 0;
+            return {
+              fillColor: getBreastCancerColor(cancerRate),
+              weight: 2,
+              opacity: 1,
+              color: 'white',
+              dashArray: '3',
+              fillOpacity: 0.7
+            };
+          },
+          onEachFeature: function(feature, layer) {
+            let geoCountyName = normalizeName(feature.properties.NAME);
+            let countyData = breastCancerRatesByCounty[geoCountyName];
+            let cancerRate = countyData ? countyData.average_annual_count : "No data";
+            let countyName = countyData ? countyData.county : "Unknown";
+            layer.bindPopup(`<strong>${countyName}</strong><br>Average Annual Breast Cancer Count: ${cancerRate}`);
+          }
+        }).addTo(breastCancerLayer);
+        breastCancerLayer.addTo(myMap);
+      }) 
+  })
   
-  // Set up the legend (optional)
-  let legend = L.control({ position: "bottomright" });
-  legend.onAdd = function() {
-    let div = L.DomUtil.create("div", "info legend");
-    let legendInfo = "<h1>Nuclear Power Plants</h1>" +
-      "<div class=\"labels\">" +
-      "<div>Locations of nuclear power plants in the USA</div>" +
-      "</div>";
-    div.innerHTML = legendInfo;
-    return div;
-  };
 
-  // Adding the legend to the map
-  legend.addTo(myMap);
 
+// Set up the legend for general cancer rates
+let cancerLegend = L.control({ position: "bottomright" });
+cancerLegend.onAdd = function() {
+  let div = L.DomUtil.create("div", "info legend");
+  let grades = [0, 200, 600, 1000, 1400, 1800];
+  div.innerHTML += "<h4>General Cancer Rates</h4>";
+  for (let i = 0; i < grades.length; i++) {
+    div.innerHTML +=
+        '<i style="background:' + getColor(grades[i]) + '"></i> ' +  // Ensure getColor is used correctly
+        grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+  }
+  return div;
+};
+cancerLegend.addTo(myMap);
+
+// Set up the legend for breast cancer rates
+let breastCancerLegend = L.control({ position: "bottomright" });
+breastCancerLegend.onAdd = function() {
+  let div = L.DomUtil.create("div", "info legend");
+  let grades = [0, 50, 100, 200, 300, 500];
+  div.innerHTML += "<h4>Breast Cancer Rates</h4>";
+  for (let i = 0; i < grades.length; i++) {
+    div.innerHTML +=
+        '<i style="background:' + getBreastCancerColor(grades[i]) + '"></i> ' +  // Ensure getBreastCancerColor is used correctly
+        grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+  }
+  return div;
+};
+breastCancerLegend.addTo(myMap);
+
+// Add layers to the map with layer controls
+let baseMaps = { "OpenStreetMap": myMap };
+let overlayMaps = {
+  "Nuclear Sites": nuclearLayer,
+  "Cancer Rates": cancerLayer,
+  "Breast Cancer Rates": breastCancerLayer
+};
+
+// Adding the layer control to the map
+L.control.layers(baseMaps, overlayMaps).addTo(myMap);
+
+// Add default layers to the map
+nuclearLayer.addTo(myMap);
+cancerLayer.addTo(myMap);
+breastCancerLayer.addTo(myMap);
