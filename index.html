@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancer Rates in America</title>
+    
+    <!-- Link to Leaflet CSS for map styling -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
+    <!-- Inline CSS for map container height and width -->
+    <style>
+        /* Set the height and width of the map div */
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+
+    <!-- Load Leaflet JS library for map functionality -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <!-- Load D3.js library for handling CSV data -->
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    
+    <!-- Link to an external CSS file -->
+    <link rel="stylesheet" type="text/css" href="Static/style.css">
+
+</head>
+<body>
+
+    <!-- Map container where Leaflet will render the map -->
+    <div id="map"></div>
+
+    <!-- Link to external JavaScript file containing the map logic -->
+    <script src="Static/nuclear.js"></script>
+
+</body>
+</html>
