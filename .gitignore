@@ -6,3 +6,8 @@ __pycache__/
 mytest.ipynb
 config.py
 Aparajita.txt
+config.py
+cancer_db.sql
+new_index.html
+
+engine = create_engine(f"postgresql+psycopg2://postgres:{password}@localhost/cancer_db")

@@ -1,39 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cancer Rates in America</title>
-    
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cancer Rates in America</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Link to Leaflet CSS for map styling -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    
     <!-- Inline CSS for map container height and width -->
     <style>
-        /* Set the height and width of the map div */
+        /* Set the height and width of the map div to a portion of the screen */
         #map {
-            height: 600px;
-            width: 100%;
+            height: 50vh;
+            width: 75vw;
+            margin: 0 auto;
+            border: 2px solid #333;
         }
     </style>
-
     <!-- Load Leaflet JS library for map functionality -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    
     <!-- Load D3.js library for handling CSV data -->
     <script src="https://d3js.org/d3.v6.min.js"></script>
-    
     <!-- Link to an external CSS file -->
     <link rel="stylesheet" type="text/css" href="Static/style.css">
-
 </head>
-<body>
 
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 p-5 text-center bg-light">
+                <h1>Cancer Rates in America</h1>
+                <p>Compared to the location of Nuclear Power Plants</p>
+            </div>
+        </div>
+    </div>
     <!-- Map container where Leaflet will render the map -->
     <div id="map"></div>
+    <!-- Section for graphs at the bottom -->
+    <div class="graphs">
+        <img src="Temporary_outputs/heatmap_top_and_bottom_10_States.png" alt="Graph 1"
+            style="width:100%; max-width:1000px;">
+        <img src="Temporary_outputs/heatmap_top_and_bottom_30_States.png" alt="Graph 2"
+            style="width:100%; max-width:1000px;">
+            
+    </div>
+
 
     <!-- Link to external JavaScript file containing the map logic -->
     <script src="Static/nuclear.js"></script>
-
 </body>
+
 </html>

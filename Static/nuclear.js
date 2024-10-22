@@ -26,8 +26,8 @@ fetch('http://127.0.0.1:5000/api/v1.0/plant_details')
       if (!isNaN(lat) && !isNaN(lon)) {
         L.circleMarker([lat, lon], {
           radius: 7,
-          fillColor: "limegreen",
-          color: "#000",
+          fillColor: "cobalt blue",
+          color: "#3BBFDA",
           weight: 1,
           fillOpacity: 0.8
         })

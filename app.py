@@ -10,6 +10,9 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import psycopg2
 
+## TO BE REMOVED
+from config import password
+
 
 #################################################
 # Database Setup (PostgreSQL)
@@ -24,7 +27,11 @@ from sqlalchemy import create_engine
 # Replace 'password' with your actual password
 #engine = create_engine("sqlite:///Cancer_Nuclear.db.sqlite")
 #database_path = "../Cancer_Cartographers/Database/Cancer_Nuclear.sqlite"
-engine = create_engine(f"sqlite:///Cancer_Cartographers/Database/CancerNuclear.sqlite")
+#engine = create_engine(f"sqlite:///Cancer_Cartographers/Database/CancerNuclear.sqlite")
+
+engine = create_engine(f"postgresql+psycopg2://postgres:{password}@localhost/cancer_db")
+inspector = inspect(engine)
+print(inspector.get_table_names())
 
 
 # Reflect the database tables
