@@ -10,32 +10,11 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(myMap);
 
 // Layer groups for nuclear plants, cancer data, and breast cancer data
-let nuclearLayer = L.layerGroup();
+
 let cancerLayer = L.layerGroup();
 let breastCancerLayer = L.layerGroup();
+let nuclearLayer = L.layerGroup();
 
-// Fetch nuclear power plant data
-fetch('http://127.0.0.1:5000/api/v1.0/plant_details')
-  .then(response => response.json())
-  .then(data => {
-    data.forEach(plant => {
-      let lat = parseFloat(plant.latitude);
-      let lon = parseFloat(plant.longitude);
-      let plantName = plant.name;
-
-      if (!isNaN(lat) && !isNaN(lon)) {
-        L.circleMarker([lat, lon], {
-          radius: 7,
-          fillColor: "limegreen",
-          color: "#000",
-          weight: 1,
-          fillOpacity: 0.8
-        })
-        .bindPopup("<strong>Nuclear Power Plant:</strong> " + plantName)
-        .addTo(nuclearLayer);
-      }
-    });
-  });
 
 // Functions to get colors based on cancer rates
 function getColor(count) {
@@ -147,7 +126,28 @@ fetch('http://127.0.0.1:5000/api/v1.0/breast_data')
       }) 
   })
   
+// Fetch nuclear power plant data
+fetch('http://127.0.0.1:5000/api/v1.0/plant_details')
+  .then(response => response.json())
+  .then(data => {
+    data.forEach(plant => {
+      let lat = parseFloat(plant.latitude);
+      let lon = parseFloat(plant.longitude);
+      let plantName = plant.name;
 
+      if (!isNaN(lat) && !isNaN(lon)) {
+        L.circleMarker([lat, lon], {
+          radius: 7,
+          fillColor: "limegreen",
+          color: "#000",
+          weight: 1,
+          fillOpacity: 0.8
+        })
+        .bindPopup("<strong>Nuclear Power Plant:</strong> " + plantName)
+        .addTo(nuclearLayer);
+      }
+    });
+  });
 
 // Set up the legend for general cancer rates
 let cancerLegend = L.control({ position: "bottomright" });
@@ -210,15 +210,16 @@ breastCancerLegend.addTo(myMap);
 // Add layers to the map with layer controls
 let baseMaps = { "OpenStreetMap": myMap };
 let overlayMaps = {
-  "Nuclear Sites": nuclearLayer,
   "General Cancer Rates": cancerLayer,
-  "Breast Cancer Rates": breastCancerLayer
+  "Breast Cancer Rates": breastCancerLayer,
+  "Nuclear Sites": nuclearLayer,
 };
 
 // Adding the layer control to the map
 L.control.layers(baseMaps, overlayMaps).addTo(myMap);
 
 // Add layers to the map
-nuclearLayer.addTo(myMap);
-cancerLayer.addTo(myMap);
+
+// cancerLayer.addTo(myMap);
 breastCancerLayer.addTo(myMap);
+//nuclearLayer.addTo(myMap);
