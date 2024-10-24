@@ -162,8 +162,8 @@ cancerLegend.onAdd = function() {
     // Add the minimum and maximum for display
     let legendInfo = "<h4>General Cancer Rates</h4>" +
         "<div class=\"labels\">" +
-        "<div class=\"min\">" + limits[0] + "</div>" +
-        "<div class=\"max\">" + limits[limits.length - 1] + "+</div>" +
+        //"<div class=\"min\">" + limits[0] + "</div>" +
+        //"<div class=\"max\">" + limits[limits.length - 1] + "+</div>" +
         "</div>";
 
     div.innerHTML = legendInfo;
@@ -190,8 +190,8 @@ breastCancerLegend.onAdd = function() {
     // Add the minimum and maximum for display
     let legendInfo = "<h4>Breast Cancer Rates</h4>" +
         "<div class=\"labels\">" +
-        "<div class=\"min\">" + limits[0] + "</div>" +
-        "<div class=\"max\">" + limits[limits.length - 1] + "+</div>" +
+        //"<div class=\"min\">" + limits[0] + "</div>" +
+        //"<div class=\"max\">" + limits[limits.length - 1] + "+</div>" +
         "</div>";
 
     div.innerHTML = legendInfo;
