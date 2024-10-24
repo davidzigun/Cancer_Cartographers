@@ -1,6 +1,59 @@
 # Cancer_Cartographers
 Project 3 Data Visualization project
 
+Cancer Incidence and Nuclear Power Plant Mapping
+
+This project provides an interactive map of the United States that visualizes cancer incidence rates by county and the locations of nuclear power plants. The map allows users to explore patterns in cancer data, with a specific focus on breast cancer, and overlay it with the proximity of nuclear power plants.
+
+Features
+
+	•	Choropleth Map: Displays cancer incidence rates by county using a color gradient.
+	•	Layer Toggles: Separate layers for general cancer data, breast cancer data, and nuclear power plant locations.
+	•	Interactive Popups: Click on any county to view the average annual cancer count.
+	•	Tile Layer: Uses OpenStreetMap tiles for the map background.
+
+ API and Data
+
+	•	Cancer Data API: The cancer data is fetched from a local API endpoint (/api/v1.0/cancer_data). Make sure your backend is running and accessible from the URL specified in the fetch() call.
+	•	GeoJSON Data: The county boundaries are loaded from the gz_2010_us_050_00_5m.json file. Ensure this file is in the appropriate location relative to the code.
+
+Usage
+
+The map will automatically display the cancer incidence rates for all counties when loaded. You can switch between different layers:
+
+	•	General Cancer Data
+	•	Breast Cancer Data
+	•	Nuclear Power Plant Locations
+
+Clicking on a county will display a popup with detailed cancer incidence data for that region.
+
+Code Explanation
+
+The following is a high-level overview of how the map is implemented:
+
+	•	Map Initialization: A Leaflet map object is created and centered on the U.S. with a zoom level of 5.
+	•	Tile Layer: The OpenStreetMap tiles are used as the base map.
+	•	Layer Groups: Three different layer groups are initialized for cancer data, breast cancer data, and nuclear power plants.
+	•	Choropleth Creation:
+	•	Cancer data is fetched from the backend.
+	•	County names are normalized to ensure consistency when mapping cancer rates to GeoJSON features.
+	•	A color scale is applied to the counties based on their cancer incidence rates.
+	•	Interactive popups are generated to show detailed data on each county when clicked.
+
+ Challenges and Learnings
+
+	•	County Name Normalization: A helper function (normalizeName()) was implemented to standardize county names across different datasets.
+	•	Data Integration: This project required integrating data from multiple sources and resolving discrepancies between datasets, such as mismatched county names.
+	•	Leaflet.js: This library was used to create the interactive map and handle data visualization.
+
+Future Improvements
+
+	•	Add more cancer types or health-related data.
+	•	Expand the API to include real-time data updates.
+	•	Allow user interaction with filters to explore the data in greater depth.
+
+
+
 
 PROPOSAL
 
